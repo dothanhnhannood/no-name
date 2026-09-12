@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiện Tượng Brain Rot Ở Giới Trẻ - Sửa Lỗi Nút Bấm</title>
+
+    <style>
+        /* Định dạng hệ thống chung */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- NÚT BẤM ☰ LUÔN NỔI LÊN TRÊN CÙNG ĐA THIẾT BỊ --- */
+        .toggle-menu-btn {
+            background: #ffffff;
+            border: 1px solid #eaeaea;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a1a;
+            transition: all 0.2s;
+            position: fixed; /* Cố định vị trí */
+            top: 10px;
+            left: 20px;
+            z-index: 100000; /* Chỉ số siêu cao để luôn nổi lên trên cùng, không bị đè khuất */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+            .toggle-menu-btn:hover {
+                background-color: #f0f0f0;
+                border-color: #000;
+            }
+
+        /* Khi menu mở trên PC, dịch chuyển nút bấm theo menu để tạo sự đồng bộ */
+        body.menu-open .toggle-menu-btn {
+            left: 300px; /* Dịch sang phải khi menu mở rộng 280px + lề */
+        }
+
+        /* --- THANH MENU BÊN TRÁI: MẶC ĐỊNH ẨN HOÀN TOÀN CỐ ĐỊNH --- */
+        .sidebar {
+            width: 280px;
+            background-color: #ffffff;
+            border-right: 1px solid #eaeaea;
+            padding: 70px 20px 30px 20px; /* Tăng padding top để nhường chỗ cho nút bấm */
+            height: 100vh;
+            position: fixed;
+            left: -280px; /* Thụt hẳn vào bên trái */
+            top: 0;
+            z-index: 99999; /* Nằm dưới nút bấm ☰ một lớp */
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+        }
+
+            /* Khi menu được kích hoạt hiện ra */
+            .sidebar.active {
+                left: 0;
+            }
+
+            .sidebar .logo {
+                font-size: 18px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 30px;
+                color: #000000;
+                padding-left: 10px;
+            }
+
+            .sidebar ul {
+                list-style: none;
+            }
+
+            .sidebar a {
+                display: flex;
+                align-items: center;
+                padding: 12px 14px;
+                margin-bottom: 6px;
+                border-radius: 6px;
+                font-size: 15px;
+                font-weight: 500;
+                color: #666666;
+                text-decoration: none;
+                transition: all 0.2s ease;
+            }
+
+                .sidebar a .icon {
+                    margin-right: 12px;
+                    font-size: 16px;
+                }
+
+                .sidebar a:hover {
+                    background-color: #f0f0f0;
+                    color: #000000;
+                }
+
+                .sidebar a.active {
+                    background-color: #000000;
+                    color: #ffffff;
+                    font-weight: 600;
+                }
+
+        /* --- KHÔNG GIAN HIỂN THỊ CHỮ BÊN PHẢI (MẶC ĐỊNH CHIẾM 100% VÀ CO GIÃN TỰ ĐỘNG) --- */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #fafafa;
+            width: 100%;
+            position: relative;
+            left: 0;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            /* KHI MENU MỞ TRÊN PC: Đẩy trang sang phải và co chiều rộng lại để không bị đè chữ */
+            .page-wrapper.shifted {
+                left: 280px;
+                width: calc(100% - 280px);
+                flex: none;
+            }
+
+        /* Thanh công cụ cố định trên cùng */
+        .page-header {
+            height: 60px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #eaeaea;
+            display: flex;
+            align-items: center;
+            padding: 0 24px 0 75px; /* Chừa khoảng trống bên trái cho nút bấm cố định */
+            flex-shrink: 0;
+        }
+
+            .page-header h1 {
+                font-size: 16px;
+                font-weight: 600;
+                color: #000000;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        /* Vùng nội dung đọc cuộn độc lập rộng rãi */
+        .page-main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+
+        /* Khối Banner chữ lớn đầu trang */
+        .hero-banner {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 50px 40px;
+            border-radius: 8px;
+            margin-bottom: 35px;
+            width: 100%;
+            max-width: 850px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            .hero-banner h2 {
+                font-size: 32px;
+                font-weight: 700;
+                margin-bottom: 12px;
+                letter-spacing: -0.5px;
+            }
+
+            .hero-banner p {
+                color: #aaaaaa;
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 0;
+            }
+
+        /* Khung chứa các bài viết */
+        .article-list {
+            max-width: 850px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .article-item {
+            background-color: #ffffff;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+            .article-item h3 {
+                font-size: 20px;
+                font-weight: 600;
+                color: #000000;
+                margin-bottom: 14px;
+            }
+
+            .article-item p {
+                font-size: 15px;
+                line-height: 1.65;
+                color: #444444;
+                margin-bottom: 12px;
+            }
+
+                .article-item p:last-child {
+                    margin-bottom: 0;
+                }
+
+        .highlight-quote {
+            border-left: 3px solid #000000;
+            padding-left: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        /* Tối ưu responsive thông minh cho điện thoại */
+        @media (max-width: 768px) {
+            /* Trên điện thoại, không cần dịch nút bấm đi xa để dễ thao tác ẩn menu */
+            body.menu-open .toggle-menu-btn {
+                left: 20px;
+            }
+
+            .page-wrapper.shifted {
+                left: 0;
+                width: 100%;
+            }
+
+            .hero-banner {
+                padding: 30px 20px;
+            }
+
+                .hero-banner h2 {
+                    font-size: 24px;
+                }
+
+            .article-item {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NÚT BẤM ☰ ĐƯỢC ĐƯA RA NGOÀI CỐ ĐỊNH, LUÔN NẰM TRÊN CÙNG -->
+    <button class="toggle-menu-btn" onclick="toggleSidebarMenu()">☰</button>
+
+    <!-- THANH MENU BÊN TRÁI -->
+    <div class="sidebar" id="sidebarMenu">
+        <div class="logo">BrainRot.Org</div>
+        <ul>
+            <li><a href="index.html" class="active"><span class="icon">🏠</span><span class="text">Trang chủ</span></a></li>
+        </ul>
+    </div>
+
+    <!-- KHÔNG GIAN ĐỌC NỘI DUNG CHÍNH -->
+    <div class="page-wrapper" id="pageWrapper">
+
+        <!-- THANH CÔNG CỤ TRÊN CÙNG -->
+        <div class="page-header">
+            <h1>Thư Viện Nghiên Cứu Hội Chứng Brain Rot</h1>
+        </div>
+
+        <!-- VÙNG HIỂN THỊ NỘI DUNG VĂN BẢN SẠCH -->
+        <div class="page-main-content">
+
+            <div class="hero-banner">
+                <h2>Hiểu về hiện tượng "Brain Rot".</h2>
+                <p>Nền tảng tư liệu độc lập phân tích sâu về tác động của kỷ nguyên video ngắn đối với khả năng nhận thức, sự kiên nhẫn và sức khỏe tinh thần của thế hệ trẻ hiện nay.</p>
+            </div>
+
+            <div class="article-list">
+
+                <div class="article-item">
+                    <h3>1. Hiện tượng "Brain Rot" là gì?</h3>
+                    <p><strong>Brain Rot</strong> (tạm dịch: Thối não) là một thuật ngữ mạng dùng để mô tả tình trạng suy giảm chức năng nhận thức, giảm sút khả năng tập trung kéo dài, và lười tư duy sâu. Hiện tượng này xuất hiện khi một cá nhân tiếp nạp quá mức các nội dung số ngắn, giật gân, mang tính chất giải trí vô bổ và lặp đi lặp lại liên tục trên mạng xã hội.</p>
+                </div>
+
+                <div class="article-item">
+                    <h3>2. Cơ chế thao túng của Dopamine ảo</h3>
+                    <p>Các nền tảng video ngắn hiện nay hoạt động dựa trên thuật toán đề xuất thông minh. Mỗi khi bạn lướt qua một video mới đánh trúng sở thích, nano bộ sẽ giải phóng một lượng nhỏ <strong>Dopamine</strong> (hormone phần thưởng). Việc nhận phần thưởng quá dễ dàng và liên tục khiến não bộ bị "lờ đờ" với các hoạt động đòi hỏi nỗ lực thực tế ngoài đời thực.</p>
+                    <div class="highlight-quote">
+                        "Khi việc tập trung đọc một trang sách không đem lại Dopamine ngay lập tức giống như lướt một video 15 giây, não bộ sẽ xu hướng từ chối việc đọc sâu và chọn cách giải trí lười biếng."
+                    </div>
+                </div>
+
+                <div class="article-item">
+                    <h3>3. Hệ quả đối với khả năng tập trung của giới trẻ</h3>
+                    <p>Nhiều nghiên cứu hành vi chỉ ra rằng thời gian chú ý trung bình của thế hệ trẻ đang có xu hướng giảm mạnh. Học sinh, sinh viên gặp khó khăn lớn hơn khi phải đối mặt với các văn bản dài, các bài giảng lý thuyết chuyên sâu hoặc khi cần giải quyết một vấn đề phức tạp đòi hỏi sự kiên nhẫn.</p>
+SS
